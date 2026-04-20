@@ -1,6 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '../services/notification.service';
 
@@ -18,7 +17,6 @@ const ERROR_MESSAGES: Partial<Record<number, string>> = {
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notifications = inject(NotificationService);
-  const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: unknown) => {
@@ -28,7 +26,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (error.status === 401) {
         notifications.show('Your session has expired. Please log in again.', 'warning');
-        router.navigate(['/login']);
         return throwError(() => error);
       }
 
