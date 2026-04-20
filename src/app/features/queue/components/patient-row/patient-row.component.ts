@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Patient, TRIAGE_LABELS, TRIAGE_LEVELS, TriageLevel } from '../../models/patient.model';
-import { WaitingTimePipe } from '../../../../shared/pipes/waiting-time.pipe';
+import { WaitingTimePipe } from '@shared/pipes/waiting-time.pipe';
 
 @Component({
   selector: 'app-patient-row',
