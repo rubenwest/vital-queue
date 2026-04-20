@@ -1,0 +1,75 @@
+:root {
+  // Colors — brand
+  --color-primary: #1a6fb3;
+  --color-primary-dark: #124f82;
+  --color-primary-light: #e8f2fc;
+
+  // Colors — triage levels
+  --color-triage-1: #d32f2f; // Immediate — red
+  --color-triage-2: #e65100; // Very Urgent — deep orange
+  --color-triage-3: #f9a825; // Urgent — amber
+  --color-triage-4: #2e7d32; // Standard — green
+  --color-triage-5: #546e7a; // Non-Urgent — blue-grey
+
+  // Colors — semantic
+  --color-success: #2e7d32;
+  --color-warning: #f9a825;
+  --color-error: #d32f2f;
+  --color-info: #0277bd;
+
+  // Colors — neutral
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f0f4f8;
+  --color-border: #dde3ea;
+  --color-text-primary: #1a202c;
+  --color-text-secondary: #4a5568;
+  --color-text-disabled: #a0aec0;
+
+  // Spacing scale
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  // Typography
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 28px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+
+  // Borders
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --border-width: 1px;
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  // Layout
+  --container-max: 1200px;
+  --sidebar-width: 360px;
+
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
