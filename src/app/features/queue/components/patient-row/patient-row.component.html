@@ -6,12 +6,11 @@
     <select
       #triageSelect
       class="triage-select"
-      [value]="patient().triageLevel"
       (change)="onTriageChange(triageSelect.value)"
       [attr.aria-label]="'Change triage level for ' + patient().name"
     >
       @for (level of triageLevels; track level) {
-        <option [value]="level">{{ triageLabels[level] }}</option>
+        <option [value]="level" [selected]="level === patient().triageLevel">{{ triageLabels[level] }}</option>
       }
     </select>
   </div>
