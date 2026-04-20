@@ -1,0 +1,91 @@
+@use 'styles/mixins' as *;
+
+.dashboard {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+
+  @include respond-to(tablet) {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  @include respond-to(mobile) {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  &__header {
+    @include flex(row, center, space-between, var(--space-4));
+    margin-bottom: var(--space-8);
+
+    @include respond-to(mobile) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__title-group {
+    @include flex(column, flex-start, center, var(--space-1));
+  }
+
+  &__title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--color-text-primary);
+  }
+
+  &__count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  &__content {
+    @include flex(column, stretch, flex-start, 0);
+  }
+}
+
+.queue-list {
+  @include flex(column, stretch, flex-start, var(--space-3));
+}
+
+.empty-state {
+  @include flex(column, center, center, var(--space-4));
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+
+  &__icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  &__message {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--color-primary-dark);
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
