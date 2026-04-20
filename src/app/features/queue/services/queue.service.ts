@@ -5,11 +5,13 @@ import { Patient, PatientIntakeForm, PatientStatus, TriageLevel } from '../model
 export class QueueService {
   private readonly _patients = signal<Patient[]>([]);
 
-  /** Active queue sorted by triage level (asc) then arrival time (asc). */
   readonly sortedQueue = computed(() =>
     this._patients()
       .filter((p) => p.status === 'waiting')
-      .sort((a, b) => a.triageLevel - b.triageLevel || a.arrivalTime.getTime() - b.arrivalTime.getTime())
+      .sort(
+        (a, b) =>
+          a.triageLevel - b.triageLevel || a.arrivalTime.getTime() - b.arrivalTime.getTime(),
+      ),
   );
 
   /** All patients, including admitted/discharged (for audit trail if needed). */
@@ -38,13 +40,11 @@ export class QueueService {
 
   updateTriageLevel(id: string, level: TriageLevel): void {
     this._patients.update((list) =>
-      list.map((p) => (p.id === id ? { ...p, triageLevel: level } : p))
+      list.map((p) => (p.id === id ? { ...p, triageLevel: level } : p)),
     );
   }
 
   private _updateStatus(id: string, status: PatientStatus): void {
-    this._patients.update((list) =>
-      list.map((p) => (p.id === id ? { ...p, status } : p))
-    );
+    this._patients.update((list) => list.map((p) => (p.id === id ? { ...p, status } : p)));
   }
 }
