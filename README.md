@@ -59,7 +59,7 @@ Colors, spacing, and triage-level indicators are defined in shared SCSS tokens. 
 - **In-memory state only.** Refreshing the page resets the queue. Intentional for the scope of the exercise.
 - **No backend integration.** All operations are synchronous and local.
 - **Dropdown for triage per row.** Chosen for compactness — an ER queue can have many patients on screen at once.
-- **Numeric triage enum.** Makes priority sorting straightforward: `a.triageLevel - b.triageLevel`.
+- **Numeric triage levels.** Keeps priority sorting straightforward: `a.triageLevel - b.triageLevel`.
 - **Deterministic ordering.** Triage first, arrival time second. In an ER context, predictable and auditable ordering matters.
 
 ## Known Limitations
