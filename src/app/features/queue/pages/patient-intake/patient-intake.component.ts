@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, viewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { QueueService } from '../../services/queue.service';
@@ -22,6 +22,7 @@ interface IntakeFormControls {
 export class PatientIntakeComponent {
   private readonly _router = inject(Router);
   private readonly _queueService = inject(QueueService);
+  private readonly _formRef = viewChild.required<ElementRef<HTMLFormElement>>('formEl');
 
   readonly triageLevels = Object.values(TriageLevel).filter(
     (v): v is TriageLevel => typeof v === 'number',
@@ -42,6 +43,7 @@ export class PatientIntakeComponent {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this._focusFirstInvalidField();
       return;
     }
 
@@ -52,5 +54,11 @@ export class PatientIntakeComponent {
 
   cancel(): void {
     this._router.navigate(['/queue']);
+  }
+
+  private _focusFirstInvalidField(): void {
+    const formEl = this._formRef().nativeElement;
+    const firstInvalid = formEl.querySelector<HTMLElement>('.ng-invalid[id]');
+    firstInvalid?.focus();
   }
 }
