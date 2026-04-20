@@ -16,7 +16,6 @@ import { TriageLevel } from '../../models/patient.model';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, PatientRowComponent],
-  providers: [QueueService],
   templateUrl: './queue-dashboard.component.html',
   styleUrl: './queue-dashboard.component.scss',
 })
