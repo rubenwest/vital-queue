@@ -3,7 +3,7 @@
     <h1 class="intake__title">Register New Patient</h1>
   </header>
 
-  <form class="intake__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <form #formEl class="intake__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
     <div class="form-field">
       <label class="form-field__label" for="name">Full name</label>
