@@ -1,10 +1,14 @@
-export enum TriageLevel {
-  Immediate = 1,
-  VeryUrgent = 2,
-  Urgent = 3,
-  Standard = 4,
-  NonUrgent = 5,
-}
+export const TriageLevel = {
+  Immediate: 1,
+  VeryUrgent: 2,
+  Urgent: 3,
+  Standard: 4,
+  NonUrgent: 5,
+} as const;
+
+export type TriageLevel = (typeof TriageLevel)[keyof typeof TriageLevel];
+
+export const TRIAGE_LEVELS = Object.values(TriageLevel);
 
 export const TRIAGE_LABELS: Record<TriageLevel, string> = {
   [TriageLevel.Immediate]: 'Level 1 — Immediate',

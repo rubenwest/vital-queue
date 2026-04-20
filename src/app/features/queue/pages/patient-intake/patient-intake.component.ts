@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, viewChild } fro
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { QueueService } from '../../services/queue.service';
-import { TriageLevel, TRIAGE_LABELS } from '../../models/patient.model';
+import { TRIAGE_LABELS, TRIAGE_LEVELS, TriageLevel } from '../../models/patient.model';
 
 interface IntakeFormControls {
   name: FormControl<string>;
@@ -24,21 +24,36 @@ export class PatientIntakeComponent {
   private readonly _queueService = inject(QueueService);
   private readonly _formRef = viewChild.required<ElementRef<HTMLFormElement>>('formEl');
 
-  readonly triageLevels = Object.values(TriageLevel).filter(
-    (v): v is TriageLevel => typeof v === 'number',
-  );
+  readonly triageLevels = TRIAGE_LEVELS;
   readonly triageLabels = TRIAGE_LABELS;
 
   readonly form = new FormGroup<IntakeFormControls>({
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
-    age: new FormControl<number | null>(null, { validators: [Validators.required, Validators.min(0), Validators.max(150)] }),
-    chiefComplaint: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
-    triageLevel: new FormControl(TriageLevel.Urgent, { nonNullable: true, validators: [Validators.required] }),
+    name: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2)],
+    }),
+    age: new FormControl<number | null>(null, {
+      validators: [Validators.required, Validators.min(0), Validators.max(150)],
+    }),
+    chiefComplaint: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+    triageLevel: new FormControl(TriageLevel.Urgent, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
-  get nameControl() { return this.form.controls.name; }
-  get ageControl() { return this.form.controls.age; }
-  get chiefComplaintControl() { return this.form.controls.chiefComplaint; }
+  get nameControl() {
+    return this.form.controls.name;
+  }
+  get ageControl() {
+    return this.form.controls.age;
+  }
+  get chiefComplaintControl() {
+    return this.form.controls.chiefComplaint;
+  }
 
   submit(): void {
     if (this.form.invalid) {
