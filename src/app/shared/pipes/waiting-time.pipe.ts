@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class WaitingTimePipe implements PipeTransform {
   // _tick is passed from the parent to force re-evaluation every second;
   // its value is not used directly — Date.now() provides the current time.
-  transform(arrivalTime: Date, _tick: number = 0): string {
+  transform(arrivalTime: Date, _tick: number): string {
     const seconds = Math.floor((Date.now() - arrivalTime.getTime()) / 1000);
 
     if (seconds < 60) {
