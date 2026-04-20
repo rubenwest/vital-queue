@@ -1,0 +1,17 @@
+@if (notificationService.hasNotifications()) {
+  <div class="toast-container" role="region" aria-label="Notifications" aria-live="assertive">
+    @for (notification of notificationService.notifications(); track notification.id) {
+      <div class="toast" [attr.data-type]="notification.type" role="alert">
+        <span class="toast__message">{{ notification.message }}</span>
+        <button
+          class="toast__close"
+          type="button"
+          (click)="notificationService.dismiss(notification.id)"
+          [attr.aria-label]="'Dismiss notification: ' + notification.message"
+        >
+          ✕
+        </button>
+      </div>
+    }
+  </div>
+}
