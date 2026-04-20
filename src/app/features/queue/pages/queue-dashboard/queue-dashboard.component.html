@@ -1,0 +1,37 @@
+<div class="dashboard">
+  <header class="dashboard__header">
+    <div class="dashboard__title-group">
+      <h1 class="dashboard__title">Emergency Room Queue</h1>
+      <span class="dashboard__count" aria-live="polite">
+        {{ queueService.sortedQueue().length }}
+        {{ queueService.sortedQueue().length === 1 ? 'patient' : 'patients' }} waiting
+      </span>
+    </div>
+    <a class="btn-primary" routerLink="intake" aria-label="Register new patient">
+      + New Patient
+    </a>
+  </header>
+
+  <main class="dashboard__content">
+    @if (queueService.sortedQueue().length === 0) {
+      <div class="empty-state" role="status">
+        <span class="empty-state__icon" aria-hidden="true">🏥</span>
+        <p class="empty-state__message">No patients currently waiting.</p>
+        <a class="btn-primary" routerLink="intake">Register first patient</a>
+      </div>
+    } @else {
+      <div class="queue-list" role="list" aria-label="Patient queue">
+        @for (patient of queueService.sortedQueue(); track patient.id) {
+          <div role="listitem">
+            <app-patient-row
+              [patient]="patient"
+              (triageLevelChanged)="onTriageLevelChanged(patient.id, $event)"
+              (admit)="onAdmit(patient.id)"
+              (discharge)="onDischarge(patient.id)"
+            />
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>
