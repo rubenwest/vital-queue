@@ -23,7 +23,7 @@
 
   <div class="patient-row__waiting" aria-live="polite" aria-label="Waiting time">
     <span class="waiting-label">Waiting</span>
-    <span class="waiting-time">{{ patient().arrivalTime | waitingTime }}</span>
+    <span class="waiting-time">{{ patient().arrivalTime | waitingTime:tick() }}</span>
   </div>
 
   <div class="patient-row__actions">

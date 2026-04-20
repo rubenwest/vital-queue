@@ -18,6 +18,7 @@ import { WaitingTimePipe } from '../../../../shared/pipes/waiting-time.pipe';
 })
 export class PatientRowComponent {
   readonly patient = input.required<Patient>();
+  readonly tick = input<number>(0);
 
   readonly triageLevelChanged = output<TriageLevel>();
   readonly admit = output<void>();
