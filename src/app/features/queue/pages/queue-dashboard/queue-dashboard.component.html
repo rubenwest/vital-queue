@@ -25,6 +25,7 @@
           <div role="listitem">
             <app-patient-row
               [patient]="patient"
+              [tick]="tick()"
               (triageLevelChanged)="onTriageLevelChanged(patient.id, $event)"
               (admit)="onAdmit(patient.id)"
               (discharge)="onDischarge(patient.id)"

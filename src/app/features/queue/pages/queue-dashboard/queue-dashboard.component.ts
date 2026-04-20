@@ -22,13 +22,11 @@ import { TriageLevel } from '../../models/patient.model';
 export class QueueDashboardComponent implements OnInit, OnDestroy {
   readonly queueService = inject(QueueService);
 
-  // Ticks every second to force WaitingTimePipe (pure: false) to re-evaluate
-  private _tick = signal(0);
-  get tick() { return this._tick(); }
+  readonly tick = signal(0);
   private _intervalId: ReturnType<typeof setInterval> | undefined;
 
   ngOnInit(): void {
-    this._intervalId = setInterval(() => this._tick.update((n) => n + 1), 1000);
+    this._intervalId = setInterval(() => this.tick.update((n: number) => n + 1), 1000);
   }
 
   ngOnDestroy(): void {
