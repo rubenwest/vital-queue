@@ -84,6 +84,10 @@ Colors, spacing, and triage-level indicators are defined in shared SCSS tokens. 
 
 - **Where AI was used:** Claude (Claude Code CLI) and GitHub Copilot for scaffolding, boilerplate generation, test skeletons, and first drafts of services and the error interceptor.
 
-- **What was generated vs manually implemented:** AI helped with initial structure and some first-pass code. Architecture decisions, service scoping, debugging, and refinement were handled manually. Two bugs in AI-generated code were caught and fixed: the waiting-time pipe was initially `pure: false` with a tick signal that was never read in any template (so OnPush never triggered re-evaluation), and the triage select used `[value]` on the `<select>` element which Angular sets before the `@for` options render, leaving the control unselected. Both required understanding the underlying mechanism to fix correctly.
+- **What was generated vs manually implemented:** AI helped with initial structure and some first-pass code. Architecture decisions, service scoping, debugging, and refinement were handled manually. Two bugs in AI-generated code were caught and fixed:
+  - The waiting-time pipe was initially `pure: false` with a tick signal that was never read in any template. With `OnPush`, Angular only re-evaluates pure pipes when their inputs change — without passing `tick` as an explicit pipe argument, the waiting times froze silently on screen. Fixed by switching to `pure: true` and threading `tick` as a second argument from dashboard → row → pipe.
+  - The triage select used `[value]` on the `<select>` element. Angular applies that binding before `@for` has rendered the `<option>` elements, so the control ends up with no matching option selected. Fixed by moving selection logic to `[selected]="level === patient().triageLevel"` on each individual option.
+
+  Both required understanding the Angular rendering and change detection pipeline to diagnose, not just reading an error message.
 
 - **What I validated myself:** Application structure and architectural choices, queue ordering and re-sorting on triage change, admit/discharge behavior, waiting-time live updates, form validation and focus management, all Copilot PR review suggestions (applied some, adjusted others, skipped none without reasoning), and final test results.
