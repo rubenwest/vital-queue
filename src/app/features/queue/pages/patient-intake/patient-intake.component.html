@@ -77,7 +77,7 @@
         aria-required="true"
       >
         @for (level of triageLevels; track level) {
-          <option [value]="level">{{ triageLabels[level] }}</option>
+          <option [ngValue]="level">{{ triageLabels[level] }}</option>
         }
       </select>
     </div>
