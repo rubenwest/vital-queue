@@ -1,116 +1,89 @@
 # VitalQueue — ER Queue Dashboard
 
-Angular application that simulates an Emergency Room queue dashboard. Built as a technical assessment for a Senior Frontend Engineer position.
+Angular application that simulates an Emergency Room queue dashboard.
 
----
+## Setup & Run
 
-## Setup & run
+- **Prerequisites:** Node.js 20+, npm 11+
+- **Install:** `npm install`
+- **Run:** `npm start` → [http://localhost:4200](http://localhost:4200)
+- **Tests:** `ng test --no-watch`
+- **Build:** `npm run build`
 
-**Requirements:** Node.js 20+, npm 11+
-
-```bash
-npm install
-npm start           # dev server → http://localhost:4200
-npm test            # unit tests (Vitest, watch mode)
-ng test --no-watch  # single test run
-npm run build       # production build
-```
-
----
-
-## Architecture decisions
+## Architecture Decisions
 
 ### Structure: `core / shared / features`
 
-Each feature is a lazy-loaded bounded context. The only feature here is `queue`, which owns its pages, components, services, and models. This maps naturally to a microfrontend boundary if the platform scales.
+I went with a simple feature-based structure. The `queue` feature owns its pages, components, services, and models, keeping related UI and business logic grouped without adding unnecessary layers.
 
-```
+This is intentionally pragmatic for a time-boxed exercise. For a larger product with multiple workflows and stricter domain boundaries, I would consider a more explicit domain/application/infrastructure separation.
+
+```text
 src/app/
-├── core/           # Singleton infrastructure: interceptors, global services
-├── shared/         # Reusable UI with no business logic: pipes, components
+├── core/        # App-wide infrastructure: interceptors, global services
+├── shared/      # Reusable UI building blocks: pipes, components
 └── features/
     └── queue/
-        ├── pages/        # Smart components (routing targets)
-        ├── components/   # Dumb components
-        ├── services/     # Business logic
-        └── models/       # Types and interfaces
+        ├── pages/       # Route-level components
+        ├── components/  # Presentational components
+        ├── services/    # Queue logic
+        └── models/      # Types and interfaces
 ```
 
 ### State: Signals + computed
 
-`QueueService` holds a single `signal<Patient[]>` as the source of truth. The sorted queue is a `computed()` that filters waiting patients and sorts by triage level → arrival time. Any mutation (add, admit, discharge, triage update) triggers automatic re-derivation with no manual subscriptions.
-
-RxJS is not used for local state — only Angular's `HttpClient` pipeline uses it, which is the appropriate boundary.
+`QueueService` uses a single `signal<Patient[]>` as the source of truth. The active queue is a `computed()` that filters waiting patients and sorts by triage level first, then by arrival time. This keeps state flow simple and avoids manual subscription management.
 
 ### Service scope
 
-`QueueService` is provided at the route level (`providers` array in `queue.routes.ts`), not `providedIn: 'root'`. This means the dashboard and intake pages share the same instance within the `/queue` route tree, but the service is destroyed when the user leaves the feature — correct scoping without global pollution.
+`QueueService` is provided at the route level, not globally. The intake and dashboard pages share the same queue instance within the feature, but the service is destroyed when the user leaves — correct scoping without polluting the root injector.
 
 ### Forms
 
-Typed Reactive Forms: `FormGroup<{ field: FormControl<T> }>`. Validations are declared in the model, not in the template. On failed submit, `markAllAsTouched()` is called and focus moves programmatically to the first invalid field via `viewChild` + `.ng-invalid[id]` selector.
+The intake form uses typed Reactive Forms with validation defined in the component class. On invalid submit, all fields are marked as touched and focus moves programmatically to the first invalid field. Small detail, but it matters in clinical contexts where accessibility is not optional.
 
 ### Waiting time display
 
-`WaitingTimePipe` is `pure: true`. A `tick` signal in `QueueDashboardComponent` increments every second via `setInterval`. It is passed as `[tick]="tick()"` to each `PatientRowComponent` and forwarded as the second argument of the pipe. This forces Angular's change detection to re-evaluate the pipe every second without needing `pure: false` or `ChangeDetectorRef`.
+Waiting time is rendered through a custom pure pipe. A timer signal in the dashboard updates every second and is passed down to each row as an input, which triggers pipe re-evaluation without relying on `pure: false` or `ChangeDetectorRef`. It took a couple of iterations to get right with OnPush — more on that in the AI section.
 
 ### Error handling
 
-A functional `HttpInterceptorFn` catches all `HttpErrorResponse` instances. Known status codes map to user-facing messages; unknown codes fall back to generic client/server error copy. `NotificationService` queues `AppNotification` signals with auto-dismiss (5 s) and timer cleanup on manual close. The toast component is mounted at root level outside `<router-outlet>` so it survives navigation.
+A small global error layer using `HttpInterceptorFn` and a signal-based `NotificationService`. The assessment runs in-memory so no real HTTP errors fire, but the infrastructure is in place for when API integration happens.
 
-### Design tokens
+### Styling
 
-All colors, spacing, typography, and triage-level colors live in `src/styles/_tokens.scss` as CSS custom properties. Components use `@use 'styles/mixins'` for layout helpers (`flex`, `card`, `respond-to`). No magic numbers in component stylesheets.
+Colors, spacing, and triage-level indicators are defined in shared SCSS tokens. No hard-coded values in component styles.
 
----
+## Trade-offs & Assumptions
 
-## Trade-offs and assumptions
+- **In-memory state only.** Refreshing the page resets the queue. Intentional for the scope of the exercise.
+- **No backend integration.** All operations are synchronous and local.
+- **Dropdown for triage per row.** Chosen for compactness — an ER queue can have many patients on screen at once.
+- **Numeric triage enum.** Makes priority sorting straightforward: `a.triageLevel - b.triageLevel`.
+- **Deterministic ordering.** Triage first, arrival time second. In an ER context, predictable and auditable ordering matters.
 
-- **In-memory state only.** There is no persistence. Refreshing the page resets the queue. A real implementation would sync with a backend via `HttpClient` and the environment's `apiBaseUrl`.
-- **No authentication.** The 401 handler in the interceptor shows a toast and is wired to navigate to `/login`, but that route does not exist in this assessment. The pattern is in place for when auth is added.
-- **Single triage selector per row.** The spec says "a control on each queue row". A dropdown was chosen over inline radio buttons for compactness at scale — an ER queue can have many patients simultaneously.
-- **`TriageLevel` as a numeric enum.** Sorting is `a.triageLevel - b.triageLevel`, which requires numbers. All form controls that deal with triage use `[ngValue]` (not `[value]`) to preserve the numeric type across Angular's binding layer.
-- **No optimistic updates / loading states.** With in-memory state, operations are synchronous. When HTTP calls are introduced, loading and error states should be added per-operation.
+## Known Limitations
 
----
+- Queue state is lost on refresh.
+- No loading or error states for queue operations (no real API).
+- No pagination or virtual scrolling for large queues.
+- No end-to-end tests.
+- Accessibility was considered but not exhaustively audited.
+- Responsive layout was designed for desktop and tablet but not validated against real clinical-device constraints.
 
-## Known limitations
+## Next Steps (More Time)
 
-- Queue state is lost on page refresh (no persistence layer).
-- No pagination or virtual scrolling — with hundreds of patients the list would become unwieldy.
-- Waiting time display truncates at hours + minutes beyond the first minute. This is intentional; clinical staff typically care about minutes, not seconds once a patient has been waiting longer.
-- No end-to-end tests. Unit tests cover services, the HTTP interceptor, the notification system, and the waiting-time pipe (39 tests total).
+- Mock or real API integration with loading and error states per operation
+- Persist queue state across refreshes (WebSocket for multi-user sync, `localStorage` as a minimum)
+- Virtual scrolling for large queues (`@angular/cdk/scrolling`)
+- End-to-end tests with Playwright for the main intake → queue → discharge flow
+- Full accessibility audit with axe-core
+- Queue history / completed-patient tracking
 
----
+## AI Usage
 
-## Next steps with more time
+- **Where AI was used:** Claude (Claude Code CLI) and GitHub Copilot for scaffolding, boilerplate generation, test skeletons, and first drafts of services and the error interceptor.
 
-- [ ] Connect to a real REST API using `environment.apiBaseUrl`; add loading skeletons and per-operation error states
-- [ ] Persist queue state across sessions (WebSocket for live multi-user sync, or `localStorage` for single-user resilience)
-- [ ] Virtual scrolling (`@angular/cdk/scrolling`) for large queues
-- [ ] End-to-end tests with Playwright covering the intake → queue → discharge flow
-- [ ] Storybook for `PatientRowComponent` and `NotificationToastComponent`
-- [ ] Full accessibility audit with axe-core; add keyboard navigation for queue actions
-- [ ] i18n with `@angular/localize` (clinical environments are often multilingual)
-- [ ] Role-based views: triage nurse vs. attending physician see different controls
+- **What was generated vs manually implemented:** AI helped with initial structure and some first-pass code. Architecture decisions, service scoping, debugging, and refinement were handled manually. Two bugs in AI-generated code were caught and fixed: the waiting-time pipe was initially `pure: false` with a tick signal that was never read in any template (so OnPush never triggered re-evaluation), and the triage select used `[value]` on the `<select>` element which Angular sets before the `@for` options render, leaving the control unselected. Both required understanding the underlying mechanism to fix correctly.
 
----
-
-## AI usage
-
-GitHub Copilot (inline suggestions) and Claude (Claude Code CLI) were used throughout.
-
-**What AI generated:**
-- Initial scaffolding: folder structure, route configuration, SCSS token system
-- Boilerplate for standalone components (decorator, imports, OnPush)
-- First drafts of `QueueService`, `WaitingTimePipe`, and the error interceptor
-- Unit test skeletons (Arrange/Act/Assert structure and edge-case enumeration)
-
-**What was manually implemented or validated:**
-- The `tick` signal pattern for OnPush-compatible live updates — AI generated `pure: false` initially; the correct approach (`pure: true` + tick as pipe argument) was reasoned through and fixed after identifying the root cause
-- The `[selected]` fix on the triage select — AI used `[value]` on the `<select>`; the rendering-order bug was diagnosed and fixed manually
-- All Copilot PR review comments were evaluated individually: some applied directly (`[ngValue]`, aria attributes), others required judgment (`AppNotification` rename, timer leak with Map)
-- Architecture decisions: service scope at route level vs. component level, signal vs. RxJS boundaries, pipe purity strategy
-- SCSS design system: token naming, triage color palette, BEM structure
-
-AI tools accelerated scaffolding and test coverage. All generated code was reviewed, several bugs were caught and corrected, and architectural decisions were made with explicit reasoning rather than accepting AI defaults.
+- **What I validated myself:** Application structure and architectural choices, queue ordering and re-sorting on triage change, admit/discharge behavior, waiting-time live updates, form validation and focus management, all Copilot PR review suggestions (applied some, adjusted others, skipped none without reasoning), and final test results.
